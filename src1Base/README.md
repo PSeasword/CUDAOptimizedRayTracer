@@ -1,6 +1,6 @@
 # Changes
 
-* Made changes to main.cu and files found in srcVec3f
+Made changes to main.cu and files found in srcVec3f:
 * Adjusted code formatting for improved readability
 * Improved indentation and white space consistency
 * Removed the use of auto for simple data type
