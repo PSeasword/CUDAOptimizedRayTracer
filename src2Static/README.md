@@ -8,5 +8,5 @@
 * Combined ambient, diffuse, and specular in get_color_at
 * Removed intermediate step of writing to mem_buffer when writing to file
 * Removed static cast of color as it is already done when writing the frame buffer to file
-* Optimized Ray::has_intersection found in RayOptimized.cuh
+* Optimized Ray::has_intersection found in srcVec3f/RayOptimized.cuh
 * Other small changes
