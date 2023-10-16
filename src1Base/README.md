@@ -11,4 +11,4 @@ Made changes to main.cu and files found in srcVec3f:
 * Added timers to different places in the code to allow for more profiling
 * Added more spheres to the scene
 * Changed reflections to also take the background color into account
-* Merged Vec3f.cuh and Vec3.cu
+* Merged Vec3f.cuh and Vec3f.cu
