@@ -40,11 +40,21 @@ read -p "Enter number for what to do: " inputOption
 inputTotal=""
 inputInformation=""
 
-if [[ "$inputOption" != 2 ]] && [[ "$inputOption" != 4 ]]; then
-  echo "----------"
-  read -p "Show device information [Y/n]: " inputInformation
-fi
+iterations=1
 
+echo "----------"
+
+if [[ "$inputOption" != 2 ]] && [[ "$inputOption" != 4 ]]; then
+  read -p "Show device information [Y/n]: " inputInformation
+  
+elif [[ "$inputOption" == 2 ]]; then
+  read -p "Number of iterations (empty for 1): " inputAverage
+  
+  if [[ "$inputAverage" != "" ]]; then
+    iterations="$inputAverage"
+  fi
+fi
+  
 echo "----------"
 
 outputFile="output.txt"
@@ -68,13 +78,6 @@ for value in "${inputValues[@]}"; do
     fi
   
   elif [[ "$inputOption" == 2 ]]; then
-    read -p "Number of iterations (empty for 1): " inputAverage
-    iterations=1
-
-    if [[ "$inputAverage" != "" ]]; then
-      iterations="$inputAverage"
-    fi
-
     averages=(0 0 0 0 0 0 0 0 0)
     titles=()
 
