@@ -48,7 +48,7 @@ __device__ int get_closest_intersection(Sphere* spheres, const Ray &r, float* cl
 }
 
 // Calculate the color to display at the intersection between ray and sphere
-__device__ Color get_color_at(const Ray &r, float intersection, Light light, const Sphere &sphere, Sphere* spheres, float3 origin) {
+__device__ Color get_color_at(const Ray &r, float intersection, Light &light, const Sphere &sphere, Sphere* spheres, float3 &origin) {
   const float surface_offset = 0.001;
   const float shadow_threshold = 0.000001;
   float shadow = 1; // Initialize shadow to full brightness
