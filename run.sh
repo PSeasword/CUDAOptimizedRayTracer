@@ -51,12 +51,12 @@ inputInformation=""
 
 iterations=1
 
-echo "----------"
-
 if [[ "$inputOption" != 2 ]] && [[ "$inputOption" != 4 ]]; then
+  echo "----------"
   read -p "Show device information [Y/n]: " inputInformation
   
 elif [[ "$inputOption" == 2 ]]; then
+  echo "----------"
   read -p "Number of iterations (empty for 1): " inputAverage
   
   if [[ "$inputAverage" != "" ]]; then
@@ -132,9 +132,9 @@ for value in "${inputValues[@]}"; do
 
   elif [[ "$inputOption" == 4 ]]; then
     if [[ "$inputInformation" != "n" ]]; then
-      /usr/local/cuda-11/bin/nv-nsight-cu-cli "$toRun" >> "$outputFile"
+      /usr/local/cuda-11/bin/nv-nsight-cu-cli ./"$toRun" "$createImage" >> "$outputFile"
     else
-      /usr/local/cuda-11/bin/nv-nsight-cu-cli "$toRun" | sed '3,23d' >> "$outputFile"
+      /usr/local/cuda-11/bin/nv-nsight-cu-cli ./"$toRun" "$createImage" | sed '3,23d' >> "$outputFile"
     fi
 
   elif [[ "$inputOption" == 5 ]]; then
