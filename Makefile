@@ -1,29 +1,33 @@
 MAIN = main.cu
-VEC3 = Vec3f.cu
 
 PATH_SRC_VEC3 = srcVec3f
 PATH_BASE = src1Base
-PATH_STATIC = src2Static
-PATH_FLOAT = src3Float
-PATH_PINNED = src4Pinned
-PATH_TRANSFER = src5Transfer
-PATH_DIVERGENCE = src6Divergence
-PATH_VALUE = src7Value
-PATH_SHARED = src8Shared
+PATH_THREADS = src2Threads
+PATH_STATIC = src3Static
+PATH_FLOAT = src4Float
+PATH_PINNED = src5Pinned
+PATH_TRANSFER = src6Transfer
+PATH_DIVERGENCE = src7Divergence
+PATH_VALUE = src8Value
+PATH_SHARED = src9Shared
 
 OUT_BASE = gpu1Base.out
-OUT_STATIC = gpu2Static.out
-OUT_FLOAT = gpu3Float.out
-OUT_PINNED = gpu4Pinned.out
-OUT_TRANSFER = gpu5Transfer.out
-OUT_DIVERGENCE = gpu6Divergence.out
-OUT_VALUE = gpu7Value.out
-OUT_SHARED = gpu8Shared.out
+OUT_THREADS = gpu2Threads.out
+OUT_STATIC = gpu3Static.out
+OUT_FLOAT = gpu4Float.out
+OUT_PINNED = gpu45inned.out
+OUT_TRANSFER = gpu6Transfer.out
+OUT_DIVERGENCE = gpu7Divergence.out
+OUT_VALUE = gpu8Value.out
+OUT_SHARED = gpu9Shared.out
 
-all: base static float pinned transfer divergence value shared
+all: base threads static float pinned transfer divergence value shared
 
 base:
 	nvcc --default-stream per-thread -arch=sm_61 $(PATH_BASE)/$(MAIN) -o $(OUT_BASE)
+
+threads:
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_THREADS)/$(MAIN) -o $(OUT_THREADS)
 
 static:
 	nvcc --default-stream per-thread -arch=sm_61 $(PATH_STATIC)/$(MAIN) -o $(OUT_STATIC)

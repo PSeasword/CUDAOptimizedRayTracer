@@ -12,7 +12,7 @@
 #include "../srcVec3f/Vec3f.cuh"
 #include "../srcVec3f/Light.cuh"
 #include "../srcVec3f/Sphere.cuh"
-#include "../srcVec3f/Ray.cuh"
+#include "../srcVec3f/RayOptimized.cuh"
 
 // CPU Timer
 auto start_CPU = std::chrono::high_resolution_clock::now();
@@ -33,45 +33,19 @@ __device__ constexpr float f_max(float a, float b) {
   return a > b ? a : b;
 }
 
-// Convert vector with normalized values to color
-__device__ Color convert_to_color(const Vec3f& v) {
-  return Color(static_cast<int>(1 * ((v.x()) * 255.999)), static_cast<int>(1 * ((v.y()) * 255.999)), static_cast<int>(1 * ((v.z()) * 255.999)));
-}
-
-// Find the closest intersecting sphere of a ray if it exists and set the closest intersection of all spheres if they exist
-__device__ int get_closest_intersection(Sphere* spheres, const Ray& r, float* intersections) {
+// Find the closest intersecting sphere of a ray if it exists and set the closest intersection of the sphere if it exists
+__device__ int get_closest_intersection(Sphere* spheres, const Ray& r, float* closest_intersection) {
   int hp = -1;
+  *closest_intersection = 100.0;
+  float current_intersection;
   
-  // Find all the spheres which the ray intersects with
-  for (int ii = 0; ii < OBJ_COUNT; ii++) {
-    intersections[ii] = r.has_intersection(spheres[ii]);
-  }
+  for (int ii = 0; ii < OBJ_COUNT; ++ii) {
+    current_intersection = r.has_intersection(spheres[ii]);
 
-  // If there is only one sphere in the scene
-  if (OBJ_COUNT == 1) {
-    // No found intersections
-    if (intersections[0] < 0) {
-      hp = -1;
-    }
-    // Found intersection
-    else {
-      hp = 0;
-    }
-  }
-  // Multiple spheres in the scene
-  else if (OBJ_COUNT > 1) {
-    float min_val = 100.0; // Current shortest distance to intersection
-
-    for (int ii = 0; ii < OBJ_COUNT; ii++) {
-      // Skip as intersection was behind the ray or did not exist
-      if (intersections[ii] < 0.0) {
-        continue;
-      }
-      // Current intersection is closer than the previous one
-      else if (intersections[ii] < min_val) {
-          min_val = intersections[ii];
-          hp = ii;
-      }
+    // Intersection exists and is in front of the ray and the current intersection is closer than the previous one
+    if (current_intersection >= 0.0 && current_intersection < *closest_intersection) {
+      *closest_intersection = current_intersection;
+      hp = ii;
     }
   }
 
@@ -80,6 +54,8 @@ __device__ int get_closest_intersection(Sphere* spheres, const Ray& r, float* in
 
 // Calculate the color to display at the intersection between ray and sphere
 __device__ Color get_color_at(const Ray &r, float intersection, Light* light, const Sphere &sphere, Sphere* spheres, Vec3f* origin) {
+  const float surface_offset = 0.001;
+  const float shadow_threshold = 0.000001;
   float shadow = 1; // Initialize shadow to full brightness
 
   Vec3f normal = sphere.get_normal_at(r.at(intersection));
@@ -97,22 +73,23 @@ __device__ Color get_color_at(const Ray &r, float intersection, Light* light, co
   reflection_ray = reflection_ray.normalize();
 
   // Reflection ray from intersection point
-  Ray rr(r.at(intersection) + 0.001 * normal, reflection_ray); // Offset ray from surface so that it does not hit the same surface it just reflected away from
-  float intersections[OBJ_COUNT];
-  int hp = get_closest_intersection(spheres, rr, intersections); // What the reflection ray hits
+  Ray rr(r.at(intersection) + surface_offset * normal, reflection_ray); // Offset ray from surface so that it does not hit the same surface it just reflected away from
+  float reflect_closest_intersection;
+  int hp = get_closest_intersection(spheres, rr, &reflect_closest_intersection); // What the reflection ray hits
   float reflect_shadow = 1;
   Color reflect_color = Vec3f(BGD_R, BGD_G, BGD_B) / 255; // Set color in reflection to be background color by default
 
   // Reflection ray hit a sphere
   if (hp != -1) {
     // Ray from intersection point on the sphere that is reflected towards the light source
-    Ray rs(rr.at(intersections[hp]) + 0.001 * spheres[hp].get_normal_at(rr.at(intersections[hp])), light->get_position() - rr.at(intersections[hp]) + 0.001 * spheres[hp].get_normal_at(rr.at(intersections[hp])));
+    Ray rs(rr.at(reflect_closest_intersection) + surface_offset * spheres[hp].get_normal_at(rr.at(reflect_closest_intersection)), light->get_position() - rr.at(reflect_closest_intersection) + surface_offset * spheres[hp].get_normal_at(rr.at(reflect_closest_intersection)));
 
     // Check if ray from intersection point on the sphere that is reflected towards the light source hits any sphere that creates a shadow
     for (int i = 0; i < OBJ_COUNT; ++i) {
       // There is a a sphere creating a shadow on the reflected sphere
-      if (rs.has_intersection(spheres[i]) > 0.000001f) {
+      if (rs.has_intersection(spheres[i]) > shadow_threshold) {
         reflect_shadow = 0.35;
+        break;
       }
     }
 
@@ -120,33 +97,35 @@ __device__ Color get_color_at(const Ray &r, float intersection, Light* light, co
   }
 
   // Calculate ambient, diffuse, and specular components of the light
-  Vec3f ambient = light->get_ambient() * light->get_color(); 
-  Vec3f diffuse = (light->get_diffuse() * f_max(dot(light_ray, normal), 0.0f)) * light->get_color();
-  Vec3f specular = light->get_specular() * pow(f_max(dot(reflection_ray, to_camera), 0.0f), 32) * light->get_color();
+  Vec3f ambient_diffuse_specular;
+  ambient_diffuse_specular = ambient_diffuse_specular + light->get_ambient() * light->get_color(); // Ambient
+  ambient_diffuse_specular = ambient_diffuse_specular + (light->get_diffuse() * f_max(dot(light_ray, normal), 0.0f)) * light->get_color(); // Diffuse
+  ambient_diffuse_specular = ambient_diffuse_specular + light->get_specular() * pow(f_max(dot(reflection_ray, to_camera), 0.0f), 32) * light->get_color(); // Specular
   
   // Ray from interesection point on original sphere towards the light source
-  Ray shadow_ray(r.at(intersection) + (0.001f * normal), light->get_position() - (r.at(intersection) + 0.001f * normal));
+  Ray shadow_ray(r.at(intersection) + (surface_offset * normal), light->get_position() - (r.at(intersection) + surface_offset * normal));
 
   // Check if ray from intersection point on original sphere towards the light source hits any sphere that creates a shadow
   for (int i = 0; i < OBJ_COUNT; ++i) {
     // There is a sphere creating a shadow on the original sphere
-    if (shadow_ray.has_intersection(spheres[i]) > 0.000001f) {
+    if (shadow_ray.has_intersection(spheres[i]) > shadow_threshold) {
       shadow = 0.35;
+      break;
     }
   }
-
-  // Final color before adding the shadow on the original sphere
-  Vec3f all_light = (ambient + diffuse + specular).cap(1) & (0.55 * (sphere.color - reflect_color) + reflect_color).cap(1);
   
-  return convert_to_color(shadow * all_light);
+  // Final color before adding the shadow on the original sphere
+  Vec3f all_light = (ambient_diffuse_specular).cap(1) & (0.55 * (sphere.color - reflect_color) + reflect_color).cap(1);
+  
+  return 255.999 * (shadow * all_light);
 }
 
 // Cast one ray per pixel
 __global__ void cast_ray(Vec3f* fb, Sphere* spheres, Light* light, Vec3f* origin) {
-  int i = (blockIdx.x * blockDim.x) + threadIdx.x;
-  int j = (blockIdx.y * blockDim.y) + threadIdx.y;
+  const int i = (blockIdx.x * blockDim.x) + threadIdx.x;
+  const int j = (blockIdx.y * blockDim.y) + threadIdx.y;
 
-  int tid = (j*WIDTH) + i;
+  const int tid = (j*WIDTH) + i;
 
   // Outside rendered pixels
   if (i >= WIDTH || j >= HEIGHT) {
@@ -154,12 +133,12 @@ __global__ void cast_ray(Vec3f* fb, Sphere* spheres, Light* light, Vec3f* origin
   }
 
   // Calculate the ray from the position of the camera toward the 3D scene through the current pixel on the 2D image plane
-  Vec3f ij(2 * (float((i) + 0.5) / (WIDTH - 1)) - 1, 1 - 2 * (float((j) + 0.5) / (HEIGHT - 1)), -1); // Direction vector for the ray
-  Vec3f dir(ij - *origin);
+  const Vec3f ij(2 * (float((i) + 0.5) / (WIDTH - 1)) - 1, 1 - 2 * (float((j) + 0.5) / (HEIGHT - 1)), -1); // Direction vector for the ray
+  const Vec3f dir(ij - *origin);
   Ray r(*origin, dir);
 
-  float intersections[OBJ_COUNT]; // The closest intersections of each sphere
-  int hp = get_closest_intersection(spheres, r, intersections); // The closest intersecting sphere
+  float closest_intersection; // The closest intersection of the closest intersecting sphere
+  const int hp = get_closest_intersection(spheres, r, &closest_intersection); // The closest intersecting sphere
 
   // Did not hit any spheres (background color)
   if (hp == -1) {
@@ -167,8 +146,7 @@ __global__ void cast_ray(Vec3f* fb, Sphere* spheres, Light* light, Vec3f* origin
   }
   // Did hit a sphere
   else {
-    Color color = get_color_at(r, intersections[hp], light, spheres[hp], spheres, origin);
-    fb[tid] = color;
+    fb[tid] = get_color_at(r, closest_intersection, light, spheres[hp], spheres, origin);
   }
 }
 
@@ -208,8 +186,8 @@ void run_kernel(const int pixels, Vec3f* fb, Sphere* spheres, Light* light, Vec3
   start_CPU_timer();
 
   // Launch kernel
-  dim3 blocks(WIDTH / 16, HEIGHT / 16);
-  cast_ray<<<blocks, dim3(16, 16)>>>(fb_device, spheres_dv, light_dv, origin_dv);
+  dim3 blocks(WIDTH / TPB, HEIGHT / TPB);
+  cast_ray<<<blocks, dim3(TPB, TPB)>>>(fb_device, spheres_dv, light_dv, origin_dv);
 
   cudaDeviceSynchronize();
 
@@ -260,7 +238,6 @@ int main(int argc, char *argv[]) {
 
   // Frame buffer for all pixels
   Vec3f* frame_buffer = new Vec3f[pixels];
-  std::vector<std::string> mem_buffer;
 
   // Create an array of spheres
   Sphere *spheres = new Sphere[OBJ_COUNT] {
@@ -304,17 +281,14 @@ int main(int argc, char *argv[]) {
   std::cout << ">> Saving Image..." << std::endl;
 
   start_CPU_timer();
-
+  
   if (write_to_file == 1) {
     // Write from the frame buffer to image file
     file << "P3" << "\n" << WIDTH << " " << HEIGHT << "\n" << "255\n";
 
     for (std::size_t i = 0; i < pixels; ++i) {
-      mem_buffer.push_back(std::to_string((int) frame_buffer[i].x()) + " " + std::to_string((int) frame_buffer[i].y()) + " " + std::to_string((int) frame_buffer[i].z()));
+      file << static_cast<int>(frame_buffer[i].x()) << " " << static_cast<int>(frame_buffer[i].y()) << " " << static_cast<int>(frame_buffer[i].z()) << "\n";
     }
-
-    std::ostream_iterator<std::string> output_iterator(file, "\n");
-    std::copy(mem_buffer.begin(), mem_buffer.end(), output_iterator);
   }
 
   stop_CPU_timer("Writing to file");

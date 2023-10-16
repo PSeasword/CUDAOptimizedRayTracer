@@ -208,8 +208,8 @@ void run_kernel(const int pixels, Vec3f* fb, Sphere* spheres, Light* light, Vec3
   start_CPU_timer();
 
   // Launch kernel
-  dim3 blocks(WIDTH / 16, HEIGHT / 16);
-  cast_ray<<<blocks, dim3(16, 16)>>>(fb_device, spheres_dv, light_dv, origin_dv);
+  dim3 blocks(WIDTH / TPB, HEIGHT / TPB);
+  cast_ray<<<blocks, dim3(TPB, TPB)>>>(fb_device, spheres_dv, light_dv, origin_dv);
 
   cudaDeviceSynchronize();
 
