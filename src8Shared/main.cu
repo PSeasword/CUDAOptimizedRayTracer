@@ -79,7 +79,7 @@ __device__ Color get_color_at(const Ray &r, float intersection, Light light, con
     const float3 reflect_intersection = rr.at(reflect_closest_intersection);
 
     // Ray from intersection point on the sphere that is reflected towards the light source
-    Ray rs(reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection), light->get_position() - reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection));
+    Ray rs(reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection), light.get_position() - reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection));
 
     // Check if ray from intersection point on the sphere that is reflected towards the light source hits any sphere that creates a shadow
     for (int i = 0; i < OBJ_COUNT; ++i) {
