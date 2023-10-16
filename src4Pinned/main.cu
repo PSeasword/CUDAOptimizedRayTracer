@@ -22,7 +22,7 @@ void start_CPU_timer(){
 }
 
 long stop_CPU_timer(const char* info){
-    elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
+    auto elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
     long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
     std::cout << microseconds << " microseconds\t\t" << info << std::endl;
     return microseconds;
