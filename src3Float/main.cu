@@ -137,7 +137,7 @@ __global__ void cast_ray(float3* fb, Sphere* spheres, Light* light, float3* orig
 
   // Did not hit any spheres (background color)
   if (hp == -1) {
-    fb[tid] = make_float3(BGD_R, BGD_G, BGD_B) // Color
+    fb[tid] = make_float3(BGD_R, BGD_G, BGD_B); // Color
   }
   // Did hit a sphere
   else {
