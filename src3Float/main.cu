@@ -205,6 +205,12 @@ void run_kernel(const int pixels, float3* fb, Sphere* spheres, Light* light, flo
 }
 
 int main(int, char**) {
+  int write_to_file = true;
+  
+  if (argc == 2) {
+    write_to_file = atoi(argv[1]);
+  }
+  
   std::ofstream file("img.ppm");
 
   const int pixels = WIDTH * HEIGHT;
@@ -273,11 +279,13 @@ int main(int, char**) {
 
   start_CPU_timer();
 
-  // Write from the frame buffer to image file
-  file << "P3" << "\n" << WIDTH << " " << HEIGHT << "\n" << "255\n";
+  if (write_to_file == 1) {
+    // Write from the frame buffer to image file
+    file << "P3" << "\n" << WIDTH << " " << HEIGHT << "\n" << "255\n";
 
-  for (std::size_t i = 0; i < pixels; ++i) {
+    for (std::size_t i = 0; i < pixels; ++i) {
       file << static_cast<int>(frame_buffer[i].x) << " " << static_cast<int>(frame_buffer[i].y) << " " << static_cast<int>(frame_buffer[i].z) << "\n";
+    }
   }
 
   stop_CPU_timer("Writing to file");

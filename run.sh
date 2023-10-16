@@ -37,6 +37,15 @@ echo "5. nvvp"
 echo "----------"
 read -p "Enter number for what to do: " inputOption
 
+createImage=1
+
+echo "----------"
+read -p "Write to image file [Y/n]: " inputImage
+
+if [[ "$inputImage" == "n" ]]; then
+  createImage=0
+fi
+
 inputTotal=""
 inputInformation=""
 
@@ -72,9 +81,9 @@ for value in "${inputValues[@]}"; do
 
   if [[ "$inputOption" == 1 ]]; then
     if [[ "$inputInformation" != "n" ]]; then
-      ./"$toRun" >> "$outputFile"
+      ./"$toRun" "$createImage" >> "$outputFile"
     else
-      ./"$toRun" | tail -n +23 >> "outputFile"
+      ./"$toRun" "$createImage" | tail -n +23 >> "outputFile"
     fi
   
   elif [[ "$inputOption" == 2 ]]; then
@@ -89,7 +98,7 @@ for value in "${inputValues[@]}"; do
       totalTime=0
       currentIndex=0
 
-      ./"$toRun" | tail -n +23 > tmp.txt
+      ./"$toRun" "$createImage" | tail -n +23 > tmp.txt
 
       while IFS= read -r line; do
         if [[ $line =~ ^[0-9] ]]; then
@@ -116,9 +125,9 @@ for value in "${inputValues[@]}"; do
     
   elif [[ "$inputOption" == 3 ]]; then
     if [[ "$inputInformation" != "n" ]]; then
-      nvprof ./"$toRun" >> "$outputFile"
+      nvprof ./"$toRun" "$createImage" >> "$outputFile"
     else
-      nvprof ./"$toRun" | sed '1,22d' >> "$outputFile"
+      nvprof ./"$toRun" "$createImage" | sed '1,22d' >> "$outputFile"
     fi
 
   elif [[ "$inputOption" == 4 ]]; then
@@ -129,7 +138,7 @@ for value in "${inputValues[@]}"; do
     fi
 
   elif [[ "$inputOption" == 5 ]]; then
-    nvprof --output-profile "${toRun%.out}".nvvp -f ./"$toRun" >> "$outputFile"
+    nvprof --output-profile "${toRun%.out}".nvvp -f ./"$toRun" "$createImage" >> "$outputFile"
   fi
 done
 

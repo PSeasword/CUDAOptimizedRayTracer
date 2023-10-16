@@ -16,14 +16,13 @@
 
 // CPU Timer
 auto start_CPU = std::chrono::high_resolution_clock::now();
-auto elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
 
 void start_CPU_timer(){
     start_CPU = std::chrono::high_resolution_clock::now();
 }
 
 long stop_CPU_timer(const char* info){
-    elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
+    auto elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
     long microseconds = std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
     std::cout << microseconds << " microseconds\t\t" << info << std::endl;
     return microseconds;
@@ -233,6 +232,12 @@ void run_kernel(const int pixels, Vec3f* fb, Sphere* spheres, Light* light, Vec3
 }
 
 int main(int, char**) {
+  int write_to_file = true;
+  
+  if (argc == 2) {
+    write_to_file = atoi(argv[1]);
+  }
+
   std::ofstream file("img.ppm");
 
   const int pixels = WIDTH * HEIGHT;
@@ -300,15 +305,17 @@ int main(int, char**) {
 
   start_CPU_timer();
 
-  // Write from the frame buffer to image file
-  file << "P3" << "\n" << WIDTH << " " << HEIGHT << "\n" << "255\n";
+  if (write_to_file == 1) {
+    // Write from the frame buffer to image file
+    file << "P3" << "\n" << WIDTH << " " << HEIGHT << "\n" << "255\n";
 
-  for (std::size_t i = 0; i < pixels; ++i) {
-    mem_buffer.push_back(std::to_string((int) frame_buffer[i].x()) + " " + std::to_string((int) frame_buffer[i].y()) + " " + std::to_string((int) frame_buffer[i].z()));
+    for (std::size_t i = 0; i < pixels; ++i) {
+      mem_buffer.push_back(std::to_string((int) frame_buffer[i].x()) + " " + std::to_string((int) frame_buffer[i].y()) + " " + std::to_string((int) frame_buffer[i].z()));
+    }
+
+    std::ostream_iterator<std::string> output_iterator(file, "\n");
+    std::copy(mem_buffer.begin(), mem_buffer.end(), output_iterator);
   }
-
-  std::ostream_iterator<std::string> output_iterator(file, "\n");
-  std::copy(mem_buffer.begin(), mem_buffer.end(), output_iterator);
 
   stop_CPU_timer("Writing to file");
 
