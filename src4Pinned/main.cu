@@ -18,7 +18,7 @@
 auto start_CPU = std::chrono::high_resolution_clock::now();
 
 void start_CPU_timer(){
-    auto start_CPU = std::chrono::high_resolution_clock::now();
+    start_CPU = std::chrono::high_resolution_clock::now();
 }
 
 long stop_CPU_timer(const char* info){
