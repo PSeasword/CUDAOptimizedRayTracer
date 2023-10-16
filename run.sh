@@ -83,7 +83,7 @@ for value in "${inputValues[@]}"; do
     if [[ "$inputInformation" != "n" ]]; then
       ./"$toRun" "$createImage" >> "$outputFile"
     else
-      ./"$toRun" "$createImage" | tail -n +23 >> "outputFile"
+      ./"$toRun" "$createImage" | tail -n +23 >> "$outputFile"
     fi
   
   elif [[ "$inputOption" == 2 ]]; then

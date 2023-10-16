@@ -23,10 +23,10 @@ OUT_SHARED = gpu8Shared.out
 all: base static float pinned transfer divergence value shared
 
 base:
-	nvcc --default-stream per-thread -arch=sm_61 -rdc=true $(PATH_BASE)/$(MAIN) $(PATH_SRC_VEC3)/$(VEC3) -o $(OUT_BASE)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_BASE)/$(MAIN) -o $(OUT_BASE)
 
 static:
-	nvcc --default-stream per-thread -arch=sm_61 -rdc=true $(PATH_STATIC)/$(MAIN) $(PATH_SRC_VEC3)/$(VEC3) -o $(OUT_STATIC)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_STATIC)/$(MAIN) -o $(OUT_STATIC)
 
 float:
 	nvcc --default-stream per-thread -arch=sm_61 $(PATH_FLOAT)/$(MAIN) -o $(OUT_FLOAT)
