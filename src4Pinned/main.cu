@@ -16,10 +16,9 @@
 
 // CPU Timer
 auto start_CPU = std::chrono::high_resolution_clock::now();
-auto elapsed = std::chrono::high_resolution_clock::now() - start_CPU;
 
 void start_CPU_timer(){
-    start_CPU = std::chrono::high_resolution_clock::now();
+    auto start_CPU = std::chrono::high_resolution_clock::now();
 }
 
 long stop_CPU_timer(const char* info){
@@ -204,7 +203,7 @@ void run_kernel(const int pixels, float3* fb, Sphere* spheres, Light* light, flo
   stop_CPU_timer("Freeing device memory");
 }
 
-int main(int, char**) {
+int main(int argc, char *argv[]) {
   int write_to_file = true;
   
   if (argc == 2) {

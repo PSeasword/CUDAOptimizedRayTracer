@@ -231,7 +231,7 @@ void run_kernel(const int pixels, Vec3f* fb, Sphere* spheres, Light* light, Vec3
   stop_CPU_timer("Freeing device memory");
 }
 
-int main(int, char**) {
+int main(int argc, char *argv[]) {
   int write_to_file = true;
   
   if (argc == 2) {
