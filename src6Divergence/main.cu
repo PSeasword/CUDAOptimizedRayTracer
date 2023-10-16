@@ -76,7 +76,7 @@ __device__ Color get_color_at(const Ray &r, float intersection, Light* light, co
 
   // Reflection ray hit a sphere
   if (hp != -1) {
-    const float3 reflect_intersection = rr.at(reflect_closest_intersection)
+    const float3 reflect_intersection = rr.at(reflect_closest_intersection);
 
     // Ray from intersection point on the sphere that is reflected towards the light source
     Ray rs(reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection), light->get_position() - reflect_intersection + surface_offset * spheres[hp].get_normal_at(reflect_intersection));
