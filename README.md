@@ -5,20 +5,22 @@ Iterations of optimizations has been split up into different directories, differ
 
 The versions have the following dependencies:
 
-src1Base  
-    |  
-src2Static  
-    |  
-src3Threads  
-    |  
-src4Float  
-    |  
-src5Pinned  
-    |  
-src6Transfer ----- src7Shared  
-    |  
-src7Divergence  
-    |  
-src8Value  
-    |  
+<pre>
+src1Base <br />
+    | <br />
+src2Static <br />
+    | <br />
+src3Threads <br />
+    | <br />
+src4Float <br />
+    | <br />
+src5Pinned <br />
+    | <br />
+src6Transfer ----- src7Shared <br />
+    | <br />
+src7Divergence <br />
+    | <br />
+src8Value <br />
+    | <br />
 src9Shared
+</pre>
