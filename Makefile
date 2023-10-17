@@ -11,15 +11,15 @@ PATH_DIVERGENCE = src7Divergence
 PATH_VALUE = src8Value
 PATH_SHARED = src9Shared
 
-OUT_BASE = gpu1Base.out
-OUT_THREADS = gpu2Threads.out
-OUT_STATIC = gpu3Static.out
-OUT_FLOAT = gpu4Float.out
-OUT_PINNED = gpu5Pinned.out
-OUT_TRANSFER = gpu6Transfer.out
-OUT_DIVERGENCE = gpu7Divergence.out
-OUT_VALUE = gpu8Value.out
-OUT_SHARED = gpu9Shared.out
+OUT_BASE = gpu1Base
+OUT_THREADS = gpu2Threads
+OUT_STATIC = gpu3Static
+OUT_FLOAT = gpu4Float
+OUT_PINNED = gpu5Pinned
+OUT_TRANSFER = gpu6Transfer
+OUT_DIVERGENCE = gpu7Divergence
+OUT_VALUE = gpu8Value
+OUT_SHARED = gpu9Shared
 
 all: base threads static float pinned transfer divergence value shared
 
@@ -51,4 +51,6 @@ shared:
 	nvcc --default-stream per-thread -arch=sm_61 $(PATH_SHARED)/$(MAIN) -o $(OUT_SHARED)
 
 clean:
-	rm -f $(OUT_BASE) $(OUT_STATIC) $(OUT_FLOAT) $(OUT_PINNED) $(OUT_TRANSFER) $(OUT_DIVERGENCE) $(OUT_VALUE) $(OUT_SHARED) img.ppm
+	rm -f $(OUT_BASE).out $(OUT_THREADS).out $(OUT_STATIC).out $(OUT_FLOAT).out $(OUT_PINNED).out $(OUT_TRANSFER).out $(OUT_DIVERGENCE).out $(OUT_VALUE).out $(OUT_SHARED).out
+	rm -f $(OUT_BASE).nvvp $(OUT_THREADS).nvvp $(OUT_STATIC).nvvp $(OUT_FLOAT).nvvp $(OUT_PINNED).nvvvp $(OUT_TRANSFER).nvvp $(OUT_DIVERGENCE).nvvp $(OUT_VALUE).nvvp $(OUT_SHARED).nvvp
+	rm -f tmp.txt img.ppm
