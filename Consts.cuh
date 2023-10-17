@@ -7,4 +7,4 @@
 #define WIDTH 8192
 #define HEIGHT 8192
 #define OBJ_COUNT 19
-#define TPB 16
+#define TPB 32
