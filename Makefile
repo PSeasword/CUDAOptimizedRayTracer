@@ -24,31 +24,31 @@ OUT_SHARED = gpu9Shared
 all: base threads static float pinned transfer divergence value shared
 
 base:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_BASE)/$(MAIN) -o $(OUT_BASE)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_BASE)/$(MAIN) -o $(OUT_BASE).out
 
 threads:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_THREADS)/$(MAIN) -o $(OUT_THREADS)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_THREADS)/$(MAIN) -o $(OUT_THREADS).out
 
 static:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_STATIC)/$(MAIN) -o $(OUT_STATIC)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_STATIC)/$(MAIN) -o $(OUT_STATIC).out
 
 float:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_FLOAT)/$(MAIN) -o $(OUT_FLOAT)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_FLOAT)/$(MAIN) -o $(OUT_FLOAT).out
 
 pinned:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_PINNED)/$(MAIN) -o $(OUT_PINNED)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_PINNED)/$(MAIN) -o $(OUT_PINNED).out
 
 transfer:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_TRANSFER)/$(MAIN) -o $(OUT_TRANSFER)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_TRANSFER)/$(MAIN) -o $(OUT_TRANSFER).out
 
 divergence:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_DIVERGENCE)/$(MAIN) -o $(OUT_DIVERGENCE)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_DIVERGENCE)/$(MAIN) -o $(OUT_DIVERGENCE).out
 
 value:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_VALUE)/$(MAIN) -o $(OUT_VALUE)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_VALUE)/$(MAIN) -o $(OUT_VALUE).out
 
 shared:
-	nvcc --default-stream per-thread -arch=sm_61 $(PATH_SHARED)/$(MAIN) -o $(OUT_SHARED)
+	nvcc --default-stream per-thread -arch=sm_61 $(PATH_SHARED)/$(MAIN) -o $(OUT_SHARED).out
 
 clean:
 	rm -f $(OUT_BASE).out $(OUT_THREADS).out $(OUT_STATIC).out $(OUT_FLOAT).out $(OUT_PINNED).out $(OUT_TRANSFER).out $(OUT_DIVERGENCE).out $(OUT_VALUE).out $(OUT_SHARED).out
