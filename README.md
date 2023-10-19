@@ -1,7 +1,7 @@
 # CUDAOptimizedRayTracer
 Project to optimize the CUDA ray tracer found in https://github.com/xkevio/CUDA-Raytracer.
 
-Iterations of optimizations has been split up into different directories, different code versions, in numerical order to allow for simple comparisons, these being src followed by a number and a name. Each directory includes a README specifying changes. Meanwhile, srcVec3f and srcFloat3 are used by multiple iterations.
+Iterations of optimizations has been split up into different directories, different code versions, in numerical order to allow for simple comparisons, these being src followed by a number and a name. Each directory includes a README specifying changes. Meanwhile, srcVec3f and srcFloat3 are used by multiple code iterations each and represent the implementation of using the proprietary 3-dimensional vector class, Vec3f, and float3, respectively.
 
 Use
 
