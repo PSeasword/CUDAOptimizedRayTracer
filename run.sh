@@ -14,7 +14,7 @@ for foundFile in *.out; do
   foundFiles+=("$displayName")
 done
 
-if [[ "$counter" == 1 ]]; then
+if [[ "$counter" == 0 ]]; then
   echo "Could not find any .out files, use make first."
   exit 0
 fi
