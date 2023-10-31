@@ -15,7 +15,7 @@ to compile all versions. Then run
 run.sh
 ```
 
-to easily be able to select any of the optimization versions as well as one of the different profiling tools used in the project. The different versions have the following dependencies where the path leading from src1Base to src7Shared is considered the final path of the project:
+to easily be able to select any of the optimization versions as well as one of the different profiling tools used in the project. The rendered image will be named `img.ppm` (Note that the image is around 670 MB as it is 8192x8192 pixels by default). The different versions have the following dependencies where the path leading from src1Base to src7Shared is considered the final path of the project:
 
 <pre>
 src1Base <br />
